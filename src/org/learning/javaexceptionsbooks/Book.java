@@ -2,13 +2,38 @@ package org.learning.javaexceptionsbooks;
 
 public class Book {
     private String title, author, editor;
-    private int pageNumbers;
+    private int pageCount;
 
-    public Book(String title, String author, String editor, int pageNumbers) {
+    public Book(String title, String author, String editor, int pageCount) {
+
+        validateTitle(title);
         this.title = title;
+
+        validateAuthor(author);
         this.author = author;
+
+        validateEditor(editor);
         this.editor = editor;
-        this.pageNumbers = pageNumbers;
+
+        validatePageCount(pageCount);
+        this.pageCount = pageCount;
+
+    }
+
+    private void validateTitle(String title) throws IllegalArgumentException {
+        if (title.trim().isEmpty()) throw new IllegalArgumentException("title too short");
+    }
+
+    private void validateAuthor(String author) throws IllegalArgumentException {
+        if (author.trim().isEmpty()) throw new IllegalArgumentException("author too short");
+    }
+
+    private void validateEditor(String editor) throws IllegalArgumentException {
+        if (editor.trim().isEmpty()) throw new IllegalArgumentException("editor too short");
+    }
+
+    private void validatePageCount(int pageCount) {
+        if (pageCount < 1) throw new IllegalArgumentException("not enough pages");
     }
 
     @Override
@@ -17,7 +42,7 @@ public class Book {
                 "title='" + title + '\'' +
                 ", author='" + author + '\'' +
                 ", editor='" + editor + '\'' +
-                ", pageNumbers=" + pageNumbers +
+                ", pageNumbers=" + pageCount +
                 '}';
     }
 
@@ -26,6 +51,7 @@ public class Book {
     }
 
     public void setTitle(String title) {
+        validateTitle(title);
         this.title = title;
     }
 
@@ -34,6 +60,7 @@ public class Book {
     }
 
     public void setAuthor(String author) {
+        validateAuthor(author);
         this.author = author;
     }
 
@@ -42,14 +69,16 @@ public class Book {
     }
 
     public void setEditor(String editor) {
+        validateEditor(editor);
         this.editor = editor;
     }
 
-    public int getPageNumbers() {
-        return pageNumbers;
+    public int getPageCount() {
+        return pageCount;
     }
 
-    public void setPageNumbers(int pageNumbers) {
-        this.pageNumbers = pageNumbers;
+    public void setPageCount(int pageCount) {
+        validatePageCount(pageCount);
+        this.pageCount = pageCount;
     }
 }
