@@ -6,34 +6,26 @@ public class Book {
 
     public Book(String title, String author, String editor, int pageCount) {
 
-        validateTitle(title);
+        validateString("Title", title);
         this.title = title;
 
-        validateAuthor(author);
+        validateString("Author", author);
         this.author = author;
 
-        validateEditor(editor);
+        validateString("Editor", editor);
         this.editor = editor;
 
-        validatePageCount(pageCount);
+        validatePageCount("Number of pages", pageCount);
         this.pageCount = pageCount;
 
     }
 
-    private void validateTitle(String title) throws IllegalArgumentException {
-        if (title.trim().isEmpty()) throw new IllegalArgumentException("title too short");
+    private void validateString(String field, String value) throws IllegalArgumentException {
+        if (field.trim().isEmpty() || field == null) throw new IllegalArgumentException(field + " cannot be empty");
     }
 
-    private void validateAuthor(String author) throws IllegalArgumentException {
-        if (author.trim().isEmpty()) throw new IllegalArgumentException("author too short");
-    }
-
-    private void validateEditor(String editor) throws IllegalArgumentException {
-        if (editor.trim().isEmpty()) throw new IllegalArgumentException("editor too short");
-    }
-
-    private void validatePageCount(int pageCount) {
-        if (pageCount < 1) throw new IllegalArgumentException("not enough pages");
+    private void validatePageCount(String field, int value) {
+        if (value <= 0) throw new IllegalArgumentException(field + " must be a number > 0");
     }
 
     @Override
@@ -51,7 +43,7 @@ public class Book {
     }
 
     public void setTitle(String title) {
-        validateTitle(title);
+        validateString("Title", title);
         this.title = title;
     }
 
@@ -60,7 +52,7 @@ public class Book {
     }
 
     public void setAuthor(String author) {
-        validateAuthor(author);
+        validateString("Author", author);
         this.author = author;
     }
 
@@ -69,7 +61,7 @@ public class Book {
     }
 
     public void setEditor(String editor) {
-        validateEditor(editor);
+        validateString("Editor", editor);
         this.editor = editor;
     }
 
@@ -78,7 +70,7 @@ public class Book {
     }
 
     public void setPageCount(int pageCount) {
-        validatePageCount(pageCount);
+        validatePageCount("Number of pages", pageCount);
         this.pageCount = pageCount;
     }
 }

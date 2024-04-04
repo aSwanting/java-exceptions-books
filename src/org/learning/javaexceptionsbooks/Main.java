@@ -21,26 +21,29 @@ public class Main {
         int pageCount = 0;
 
         for (int i = 0; i < books.length; i++) {
-            System.out.println("book " + (i + 1));
+            System.out.println("\nBook N°" + (i + 1));
 
             if (title == null || title.trim().isEmpty()) {
-                System.out.println("enter title");
+                System.out.print("Title: ");
                 title = scan.nextLine();
             }
 
             if (author == null || author.trim().isEmpty()) {
-                System.out.println("enter author");
+                System.out.print("Author: ");
                 author = scan.nextLine();
             }
 
             if (editor == null || editor.trim().isEmpty()) {
-                System.out.println("enter editor");
+                System.out.print("Editor: ");
                 editor = scan.nextLine();
             }
 
             if (pageCount < 1) {
-                System.out.println("enter number of pages");
-                pageCount = Integer.parseInt(scan.nextLine());
+                System.out.print("N° of pages: ");
+                try {
+                    pageCount = Integer.parseInt(scan.nextLine());
+                } catch (IllegalArgumentException ignored) {
+                }
             }
 
             try {
@@ -50,7 +53,7 @@ public class Main {
                 editor = null;
                 pageCount = 0;
             } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+                System.out.println("Bad parameter: " + e.getMessage());
                 i--;
             }
         }
@@ -69,7 +72,7 @@ public class Main {
     }
 
     public static void printFromFile() {
-        System.out.println("reading list from file...");
+        System.out.println("\nReading list from file...");
         File readingList = new File("fw.txt");
         Scanner reader;
         try {
