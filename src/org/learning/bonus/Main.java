@@ -11,16 +11,13 @@ public class Main {
     public static int cols = 3;
     public static Scanner scan = new Scanner(System.in);
     public static int currentPlayer;
+
+    public static Cell[] currentPlayerCells;
     public static Cell[] winningCellsP1 = new Cell[9];
     public static Cell[] winningCellsP2 = new Cell[9];
 
-//    public static playedCells(Cell cell, int player) {
-//        if (player ==1) {
-//            cellsP1.
-//        }
-//    }
-
     public static void startGame() {
+
         boolean gameOver = false;
         int turn = 0;
         int cellCount = 9;
@@ -37,19 +34,32 @@ public class Main {
             System.out.print("Player " + currentPlayer + " enter cell coordinates (row-col): ");
             String playerChoice = scan.nextLine();
 
-            String[] coords = new String[cells.length];
-            for (int i = 0; i < cells.length; i++) {
-                coords[i] = cells[i].cellCoordinates;
-            }
-
             boolean cellMatch = false;
             for (Cell cell : cells) {
                 if (cell.cellCoordinates.equals(playerChoice)) {
                     cellMatch = true;
                     try {
                         if (!cell.checked) {
+
+//                            if (winningCellsP1 != null) {
+//                                for (Cell wcell : winningCellsP1) {
+//
+//                                    if (wcell != null) {
+//                                        if (wcell.cellCoordinates.equals(playerChoice) && currentPlayer == 1) {
+//                                            try {
+//                                                throw new Exception("P1 WINS");
+//                                            } catch (Exception e) {
+//                                                System.err.println(e.getMessage());
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+
                             cell.checkCell(currentPlayer);
-                            adjacentCells(cell, currentPlayer);
+//                            adjacentCells(cell);
+//                            System.out.println("p1 winning cells: " + Arrays.toString(Arrays.stream(winningCellsP1).filter(Objects::nonNull).map(cell1 -> cell1.cellCoordinates).toArray()));
+//                            System.out.println("p2 winning cells: " + Arrays.toString(Arrays.stream(winningCellsP2).filter(Objects::nonNull).map(cell1 -> cell1.cellCoordinates).toArray()));
                         } else {
                             throw new IllegalArgumentException("Cell is already checked, choose a different cell.");
                         }
@@ -69,109 +79,190 @@ public class Main {
             }
             System.out.println("\nRedrawing...\n");
             System.out.println(drawGrid());
+
+            checkWinner();
+
             turn++;
             System.out.println("\nTurns played " + turn + "\n");
 
         }
     }
 
-    public static void adjacentCells(Cell cell, int player) {
-        System.out.println("\nCell " + cell.cellCoordinates + " has the following adjacent cells:");
-        System.out.println("(Negative values should be ignored, work in progress...)\n");
+    private static void checkWinner() {
 
-        int adjCount = 0;
-        Cell topLeft;
-        Cell top;
-        Cell topRight;
-        Cell midLeft;
-        Cell midRight;
-        Cell botLeft;
-        Cell bot;
-        Cell botRight;
+        currentPlayerCells = Arrays.stream(cells).filter(cell -> cell.checkedBy == currentPlayer).toArray(Cell[]::new);
+        System.out.println("p" + currentPlayer + " cells(" + currentPlayerCells.length + "): ");
 
-        Cell[] playerCells = Arrays.stream(cells).filter(value -> value.checkedBy == player).toArray(Cell[]::new);
+        int hCells = 0;
+        int vCells = 0;
+        int lDiagCells = 0;
+        int rDiagCells = 0;
+
+        for (Cell cell : currentPlayerCells) {
+
+            hCells = checkHorizontalCells(cell);
+            vCells = checkVerticalCells(cell);
+            lDiagCells = checkLeftDiagonalCells(cell);
+            rDiagCells = checkRightDiagonalCells(cell);
+            System.out.print(cell.cellCoordinates + " ");
+
+        }
+
+        System.out.println("\n");
+        System.out.println("cells in row: " + hCells);
+        System.out.println("cells in col: " + vCells);
+        System.out.println("cells in left diagonal: " + lDiagCells);
+        System.out.println("cells in right diagonal: " + rDiagCells);
+    }
+
+    private static int checkHorizontalCells(Cell currentCell) {
+
+        int colLeft = currentCell.cellCol;
+        int colRight = currentCell.cellCol;
+        int rowUp = currentCell.cellRow;
+        int rowDown = currentCell.cellRow;
+        int count = 1;
+
+        for (Cell cell1 : currentPlayerCells) {
+
+            for (int j = 0; j < 2; j++) {
+
+                if (cell1.cellCoordinates.equals((currentCell.cellRow) + "-" + (--colLeft))) {
+                    count++;
+                }
+                if (cell1.cellCoordinates.equals((currentCell.cellRow) + "-" + (++colRight))) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private static int checkVerticalCells(Cell currentCell) {
+        int colLeft = currentCell.cellCol;
+        int colRight = currentCell.cellCol;
+        int rowUp = currentCell.cellRow;
+        int rowDown = currentCell.cellRow;
+        int count = 1;
+
+        for (Cell cell1 : currentPlayerCells) {
+
+            for (int j = 0; j < 2; j++) {
+
+                if (cell1.cellCoordinates.equals((--rowUp) + "-" + (currentCell.cellCol))) {
+                    count++;
+                }
+                if (cell1.cellCoordinates.equals((++rowDown) + "-" + (currentCell.cellCol))) {
+                    count++;
+
+                }
+            }
+        }
+        return count;
+    }
+
+    private static int checkLeftDiagonalCells(Cell currentCell) {
+        int colLeft = currentCell.cellCol;
+        int colRight = currentCell.cellCol;
+        int rowUp = currentCell.cellRow;
+        int rowDown = currentCell.cellRow;
+        int count = 1;
+
+        for (Cell cell1 : currentPlayerCells) {
+
+            for (int j = 0; j < 2; j++) {
+
+                if (cell1.cellCoordinates.equals((--rowUp) + "-" + (--colLeft))) {
+                    count++;
+                }
+                if (cell1.cellCoordinates.equals((++rowDown) + "-" + (++colRight))) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private static int checkRightDiagonalCells(Cell currentCell) {
+        int colLeft = currentCell.cellCol;
+        int colRight = currentCell.cellCol;
+        int rowUp = currentCell.cellRow;
+        int rowDown = currentCell.cellRow;
+        int count = 1;
+
+        for (Cell cell1 : currentPlayerCells) {
+
+            for (int j = 0; j < 2; j++) {
+
+                if (cell1.cellCoordinates.equals((--rowUp) + "-" + (++colRight))) {
+                    count++;
+                }
+                if (cell1.cellCoordinates.equals((++rowDown) + "-" + (--colLeft))) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public static void adjacentCells(Cell cell) {
+
+        Cell[] playerCells = Arrays.stream(cells).filter(value -> value.checkedBy == currentPlayer).toArray(Cell[]::new);
 
         for (Cell value : playerCells) {
             if (value.checked) {
 
                 if (value.cellCoordinates.equals((cell.cellRow - 1) + "-" + (cell.cellCol - 1))) {
-                    topLeft = value;
-                    System.out.println("top-left: " + value.cellCoordinates);
-                    adjCount++;
                     findWinningCells("top-left", value);
                 }
 
                 if (value.cellCoordinates.equals((cell.cellRow - 1) + "-" + (cell.cellCol))) {
-                    top = value;
-                    System.out.println("top: " + value.cellCoordinates);
-                    adjCount++;
                     findWinningCells("top", value);
                 }
 
                 if (value.cellCoordinates.equals((cell.cellRow - 1) + "-" + (cell.cellCol + 1))) {
-                    topRight = value;
-                    System.out.println("top-right: " + value.cellCoordinates);
-                    adjCount++;
                     findWinningCells("top-right", value);
                 }
 
                 if (value.cellCoordinates.equals((cell.cellRow) + "-" + (cell.cellCol - 1))) {
-                    midLeft = value;
-                    System.out.println("left: " + value.cellCoordinates);
-                    adjCount++;
                     findWinningCells("left", value);
                 }
 
                 if (value.cellCoordinates.equals((cell.cellRow) + "-" + (cell.cellCol + 1))) {
-                    midRight = value;
-                    System.out.println("right: " + value.cellCoordinates);
-                    adjCount++;
                     findWinningCells("right", value);
                 }
 
                 if (value.cellCoordinates.equals((cell.cellRow + 1) + "-" + (cell.cellCol - 1))) {
-                    botLeft = value;
-                    System.out.println("bot-left: " + value.cellCoordinates);
-                    adjCount++;
                     findWinningCells("bot-left", value);
                 }
 
                 if (value.cellCoordinates.equals((cell.cellRow + 1) + "-" + (cell.cellCol))) {
-                    bot = value;
-                    System.out.println("bot: " + value.cellCoordinates);
-                    adjCount++;
                     findWinningCells("bot", value);
                 }
 
                 if (value.cellCoordinates.equals((cell.cellRow + 1) + "-" + (cell.cellCol + 1))) {
-                    botRight = value;
-                    System.out.println("bot-right: " + value.cellCoordinates);
-                    adjCount++;
                     findWinningCells("bot-right", value);
                 }
             }
         }
-
-        System.out.println(adjCount + " adjacent cell(s)");
-
     }
 
     private static void findWinningCells(String field, Cell value) {
-
 
         switch (field) {
 
             case "top-left":
             case "bot-right":
-                System.out.println("winning tiles top-left or bottom-right");
                 String topLeft = (value.cellRow - 1) + "-" + (value.cellCol - 1);
                 String botRight = (value.cellRow + 1) + "-" + (value.cellCol + 1);
                 for (int i = 0; i < cells.length; i++) {
-                    if ((cells[i].cellCoordinates.equals(topLeft) || cells[i].cellCoordinates.equals(botRight)) && !cells[i].checked) {
-                        if (currentPlayer == 1) {
-                            winningCellsP1[i] = cells[i];
-                        } else {
-                            winningCellsP2[i] = cells[i];
+                    if ((cells[i].cellCoordinates.equals(topLeft) || cells[i].cellCoordinates.equals(botRight))) {
+                        if (!cells[i].checked || cells[i].checkedBy == currentPlayer) {
+                            if (currentPlayer == 1) {
+                                winningCellsP1[i] = cells[i];
+                            } else {
+                                winningCellsP2[i] = cells[i];
+                            }
                         }
                     }
                 }
@@ -179,15 +270,16 @@ public class Main {
 
             case "top":
             case "bot":
-                System.out.println("winning tiles top or bottom");
                 String top = (value.cellRow - 1) + "-" + (value.cellCol);
                 String bottom = (value.cellRow + 1) + "-" + (value.cellCol);
                 for (int i = 0; i < cells.length; i++) {
-                    if ((cells[i].cellCoordinates.equals(top) || cells[i].cellCoordinates.equals(bottom)) && !cells[i].checked) {
-                        if (currentPlayer == 1) {
-                            winningCellsP1[i] = cells[i];
-                        } else {
-                            winningCellsP2[i] = cells[i];
+                    if ((cells[i].cellCoordinates.equals(top) || cells[i].cellCoordinates.equals(bottom))) {
+                        if (!cells[i].checked || cells[i].checkedBy == currentPlayer) {
+                            if (currentPlayer == 1) {
+                                winningCellsP1[i] = cells[i];
+                            } else {
+                                winningCellsP2[i] = cells[i];
+                            }
                         }
                     }
                 }
@@ -195,15 +287,16 @@ public class Main {
 
             case "top-right":
             case "bot-left":
-                System.out.println("winning tiles top-right or bottom-left");
                 String topRight = (value.cellRow - 1) + "-" + (value.cellCol + 1);
-                String botLeft = (value.cellRow - 1) + "-" + (value.cellCol - 1);
+                String botLeft = (value.cellRow + 1) + "-" + (value.cellCol - 1);
                 for (int i = 0; i < cells.length; i++) {
-                    if ((cells[i].cellCoordinates.equals(topRight) || cells[i].cellCoordinates.equals(botLeft)) && !cells[i].checked) {
-                        if (currentPlayer == 1) {
-                            winningCellsP1[i] = cells[i];
-                        } else {
-                            winningCellsP2[i] = cells[i];
+                    if ((cells[i].cellCoordinates.equals(topRight) || cells[i].cellCoordinates.equals(botLeft))) {
+                        if (!cells[i].checked || cells[i].checkedBy == currentPlayer) {
+                            if (currentPlayer == 1) {
+                                winningCellsP1[i] = cells[i];
+                            } else {
+                                winningCellsP2[i] = cells[i];
+                            }
                         }
                     }
                 }
@@ -211,20 +304,20 @@ public class Main {
 
             case "mid-left":
             case "mid-right":
-                System.out.println("winning tiles left or right");
                 String left = (value.cellRow) + "-" + (value.cellCol - 1);
                 String right = (value.cellRow) + "-" + (value.cellCol + 1);
                 for (int i = 0; i < cells.length; i++) {
-                    if ((cells[i].cellCoordinates.equals(left) || cells[i].cellCoordinates.equals(right)) && !cells[i].checked) {
-                        if (currentPlayer == 1) {
-                            winningCellsP1[i] = cells[i];
-                        } else {
-                            winningCellsP2[i] = cells[i];
+                    if ((cells[i].cellCoordinates.equals(left) || cells[i].cellCoordinates.equals(right))) {
+                        if (!cells[i].checked || cells[i].checkedBy == currentPlayer) {
+                            if (currentPlayer == 1) {
+                                winningCellsP1[i] = cells[i];
+                            } else {
+                                winningCellsP2[i] = cells[i];
+                            }
                         }
                     }
                 }
                 break;
-
         }
     }
 
