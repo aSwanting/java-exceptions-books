@@ -11,14 +11,14 @@ public class Main {
     public static int cols = 3;
     public static Scanner scan = new Scanner(System.in);
     public static int currentPlayer;
-
     public static Cell[] currentPlayerCells;
     public static Cell[] winningCellsP1 = new Cell[9];
     public static Cell[] winningCellsP2 = new Cell[9];
+    public static boolean gameOver;
 
     public static void startGame() {
 
-        boolean gameOver = false;
+        gameOver = false;
         int turn = 0;
         int cellCount = 9;
 
@@ -29,7 +29,7 @@ public class Main {
         System.out.println("\nStarting game...\n");
         System.out.println(drawGrid());
 
-        while (!gameOver || turn < 9) {
+        while (!gameOver && turn < 9) {
             currentPlayer = turn % 2 == 0 ? 1 : 2;
             System.out.print("Player " + currentPlayer + " enter cell coordinates (row-col): ");
             String playerChoice = scan.nextLine();
@@ -80,11 +80,89 @@ public class Main {
             System.out.println("\nRedrawing...\n");
             System.out.println(drawGrid());
 
-            checkWinner();
+//            checkWinner();
+            gridStats();
 
             turn++;
             System.out.println("\nTurns played " + turn + "\n");
 
+        }
+    }
+
+    private static void gridStats() {
+
+        checkRows();
+        checkCols();
+        checkLeftDiagonal();
+        checkRightDiagonal();
+
+    }
+
+    private static void checkRows() {
+        for (int i = 0; i < 3; i++) {
+            int p1Score = 0, p2Score = 0;
+            for (int j = 0; j < 3; j++) {
+                for (Cell cell : cells) {
+                    if (cell.cellCoordinates.equals(i + "-" + j)) {
+                        if (cell.checkedBy == 1) p1Score++;
+                        if (cell.checkedBy == 2) p2Score++;
+                    }
+                }
+            }
+            if (p1Score == 3 || p2Score == 3) {
+                gameOver = true;
+                System.err.println("Player " + currentPlayer + " WINS!");
+            }
+        }
+    }
+
+    private static void checkCols() {
+        for (int i = 0; i < 3; i++) {
+            int p1Score = 0, p2Score = 0;
+            for (int j = 0; j < 3; j++) {
+                for (Cell cell : cells) {
+                    if (cell.cellCoordinates.equals(j + "-" + i)) {
+                        if (cell.checkedBy == 1) p1Score++;
+                        if (cell.checkedBy == 2) p2Score++;
+                    }
+                }
+            }
+            if (p1Score == 3 || p2Score == 3) {
+                gameOver = true;
+                System.err.println("Player " + currentPlayer + " WINS!");
+            }
+        }
+    }
+
+    private static void checkLeftDiagonal() {
+        int p1Score = 0, p2Score = 0;
+        for (int i = 0; i < 3; i++) {
+            for (Cell cell : cells) {
+                if (cell.cellCoordinates.equals(i + "-" + i)) {
+                    if (cell.checkedBy == 1) p1Score++;
+                    if (cell.checkedBy == 2) p2Score++;
+                }
+            }
+        }
+        if (p1Score == 3 || p2Score == 3) {
+            gameOver = true;
+            System.err.println("Player " + currentPlayer + " WINS!");
+        }
+    }
+
+    private static void checkRightDiagonal() {
+        int p1Score = 0, p2Score = 0;
+        for (int i = 0; i < 3; i++) {
+            for (Cell cell : cells) {
+                if (cell.cellCoordinates.equals((2 - i) + "-" + i)) {
+                    if (cell.checkedBy == 1) p1Score++;
+                    if (cell.checkedBy == 2) p2Score++;
+                }
+            }
+        }
+        if (p1Score == 3 || p2Score == 3) {
+            gameOver = true;
+            System.err.println("Player " + currentPlayer + " WINS!");
         }
     }
 
